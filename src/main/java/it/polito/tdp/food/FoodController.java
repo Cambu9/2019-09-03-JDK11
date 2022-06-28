@@ -5,8 +5,14 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+
+import org.jgrapht.graph.DefaultWeightedEdge;
+
 import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.Vicini;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,7 +46,7 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -54,15 +60,30 @@ public class FoodController {
     @FXML
     void doCorrelate(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Cerco porzioni correlate...");
     	
+    	String s = boxPorzioni.getValue();
+    	if(s == null) {
+    		txtResult.appendText("Devi selezionare una porzione");
+    		return;
+    	}
+    	txtResult.appendText("Cerco porzioni correlate...\n");
+    	List<Vicini> archi = model.correlate(s);
+    	for(Vicini v: archi) {
+    		txtResult.appendText(v.toString());
+    	}
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
-    	
+    	txtResult.appendText("Creazione grafo... \n");
+    	try {
+    		txtResult.appendText(model.creaGrafo(Integer.parseInt(txtCalorie.getText())));
+    	}catch(NumberFormatException e) {
+    		txtResult.appendText("Devi inserire un numero!");
+    		return;
+    	}
+    	boxPorzioni.getItems().addAll(model.vertici());
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
